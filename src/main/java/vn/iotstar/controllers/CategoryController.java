@@ -31,24 +31,49 @@ public class CategoryController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html;charset=UTF-8");
+
         String url = req.getRequestURI();
         if (url.contains("/admin/categories") || url.contains("/admin/category/list")) {
-            List<Category> list = cateService.findAll();
+            String keyword = req.getParameter("keyword");
+            List<Category> list;
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                list = cateService.searchByName(keyword.trim());
+                req.setAttribute("keyword", keyword.trim());
+            } else {
+                list = cateService.findAll();
+            }
             req.setAttribute("listcate", list);
-            req.getRequestDispatcher("/views/admin/category-list.jsp").forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.CATEGORY_LIST).forward(req, resp);
         } else if (url.contains("/admin/category/add")) {
-            req.getRequestDispatcher("/views/admin/category-add.jsp").forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.CATEGORY_ADD).forward(req, resp);
         } else if (url.contains("/admin/category/edit")) {
-            int id = Integer.parseInt(req.getParameter("id"));
-            Category category = cateService.findById(id);
-            req.setAttribute("cate", category);
-            req.getRequestDispatcher("/views/admin/category-edit.jsp").forward(req, resp);
+            String idStr = req.getParameter("id");
+            if (idStr != null && !idStr.isEmpty()) {
+                int id = Integer.parseInt(idStr);
+                Category category = cateService.findById(id);
+                req.setAttribute("cate", category);
+            }
+            req.getRequestDispatcher(Constant.Path.CATEGORY_EDIT).forward(req, resp);
         } else if (url.contains("/admin/category/delete")) {
-            int id = Integer.parseInt(req.getParameter("id"));
-            try {
-                cateService.delete(id);
-            } catch (Exception e) {
-                e.printStackTrace();
+            String idStr = req.getParameter("id");
+            if (idStr != null && !idStr.isEmpty()) {
+                int id = Integer.parseInt(idStr);
+                try {
+                    Category category = cateService.findById(id);
+                    if (category != null) {
+                        String oldImage = category.getImages();
+                        cateService.delete(id);
+                        if (oldImage != null && !oldImage.startsWith("http") && !oldImage.equals("avatar.png")) {
+                            deleteFile(Constant.DIR + File.separator + "category" + File.separator + oldImage);
+                            deleteFile(Constant.DIR + File.separator + oldImage);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             resp.sendRedirect(req.getContextPath() + "/admin/categories");
         }
@@ -56,19 +81,39 @@ public class CategoryController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html;charset=UTF-8");
+
         String url = req.getRequestURI();
 
         if (url.contains("/admin/category/insert")) {
             String categoryname = req.getParameter("categoryname");
-            int status = Integer.parseInt(req.getParameter("status"));
+            String statusStr = req.getParameter("status");
+            int status = (statusStr != null) ? Integer.parseInt(statusStr) : 1;
             String images = req.getParameter("images");
 
+            if (categoryname == null || categoryname.trim().isEmpty()) {
+                req.setAttribute("alert", "Tên danh mục không được để trống!");
+                req.getRequestDispatcher(Constant.Path.CATEGORY_ADD).forward(req, resp);
+                return;
+            }
+
+            if (cateService.findByCategoryname(categoryname.trim()) != null) {
+                req.setAttribute("alert", "Tên danh mục này đã tồn tại!");
+                req.setAttribute("categoryname", categoryname);
+                req.setAttribute("images", images);
+                req.setAttribute("status", status);
+                req.getRequestDispatcher(Constant.Path.CATEGORY_ADD).forward(req, resp);
+                return;
+            }
+
             Category category = new Category();
-            category.setCategoryname(categoryname);
+            category.setCategoryname(categoryname.trim());
             category.setStatus(status);
 
             String fname = "";
-            String uploadPath = Constant.DIR;
+            String uploadPath = Constant.DIR + File.separator + "category";
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
@@ -79,12 +124,12 @@ public class CategoryController extends HttpServlet {
                 if (part != null && part.getSize() > 0) {
                     String filename = Paths.get(part.getSubmittedFileName()).getFileName().toString();
                     int index = filename.lastIndexOf(".");
-                    String ext = filename.substring(index + 1);
+                    String ext = (index > 0) ? filename.substring(index + 1) : "png";
                     fname = System.currentTimeMillis() + "." + ext;
                     part.write(uploadPath + File.separator + fname);
                     category.setImages(fname);
                 } else if (images != null && !images.trim().isEmpty()) {
-                    category.setImages(images);
+                    category.setImages(images.trim());
                 } else {
                     category.setImages("avatar.png");
                 }
@@ -99,17 +144,33 @@ public class CategoryController extends HttpServlet {
         if (url.contains("/admin/category/update")) {
             int categoryid = Integer.parseInt(req.getParameter("categoryid"));
             String categoryname = req.getParameter("categoryname");
-            int status = Integer.parseInt(req.getParameter("status"));
+            String statusStr = req.getParameter("status");
+            int status = (statusStr != null) ? Integer.parseInt(statusStr) : 1;
             String images = req.getParameter("images");
 
             Category category = cateService.findById(categoryid);
             if (category != null) {
+                if (categoryname == null || categoryname.trim().isEmpty()) {
+                    req.setAttribute("alert", "Tên danh mục không được để trống!");
+                    req.setAttribute("cate", category);
+                    req.getRequestDispatcher(Constant.Path.CATEGORY_EDIT).forward(req, resp);
+                    return;
+                }
+
+                Category exist = cateService.findByCategoryname(categoryname.trim());
+                if (exist != null && exist.getCategoryId() != categoryid) {
+                    req.setAttribute("alert", "Tên danh mục này đã tồn tại!");
+                    req.setAttribute("cate", category);
+                    req.getRequestDispatcher(Constant.Path.CATEGORY_EDIT).forward(req, resp);
+                    return;
+                }
+
                 String fileold = category.getImages();
-                category.setCategoryname(categoryname);
+                category.setCategoryname(categoryname.trim());
                 category.setStatus(status);
 
                 String fname = "";
-                String uploadPath = Constant.DIR;
+                String uploadPath = Constant.DIR + File.separator + "category";
                 File uploadDir = new File(uploadPath);
                 if (!uploadDir.exists()) {
                     uploadDir.mkdirs();
@@ -120,15 +181,16 @@ public class CategoryController extends HttpServlet {
                     if (part != null && part.getSize() > 0) {
                         if (fileold != null && !fileold.startsWith("http") && !fileold.equals("avatar.png")) {
                             deleteFile(uploadPath + File.separator + fileold);
+                            deleteFile(Constant.DIR + File.separator + fileold);
                         }
                         String filename = Paths.get(part.getSubmittedFileName()).getFileName().toString();
                         int index = filename.lastIndexOf(".");
-                        String ext = filename.substring(index + 1);
+                        String ext = (index > 0) ? filename.substring(index + 1) : "png";
                         fname = System.currentTimeMillis() + "." + ext;
                         part.write(uploadPath + File.separator + fname);
                         category.setImages(fname);
                     } else if (images != null && !images.trim().isEmpty()) {
-                        category.setImages(images);
+                        category.setImages(images.trim());
                     } else {
                         category.setImages(fileold);
                     }
@@ -142,10 +204,14 @@ public class CategoryController extends HttpServlet {
         }
     }
 
-    public static void deleteFile(String filePath) throws IOException {
-        Path path = Paths.get(filePath);
-        if (Files.exists(path)) {
-            Files.delete(path);
+    public static void deleteFile(String filePath) {
+        try {
+            Path path = Paths.get(filePath);
+            if (Files.exists(path)) {
+                Files.delete(path);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

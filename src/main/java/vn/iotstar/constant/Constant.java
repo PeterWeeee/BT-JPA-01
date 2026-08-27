@@ -19,9 +19,9 @@ public class Constant {
         public static final String COOKIE_DEMO = "/views/cookie-demo.jsp";
         public static final String ERROR = "/views/error.jsp";
         
-        // Category views (Theo Slide 14)
-        public static final String CATEGORY_LIST = "/views/admin/list-category.jsp";
-        public static final String CATEGORY_ADD = "/views/admin/add-category.jsp";
-        public static final String CATEGORY_EDIT = "/views/admin/edit-category.jsp";
+        // Category views
+        public static final String CATEGORY_LIST = "/views/admin/category-list.jsp";
+        public static final String CATEGORY_ADD = "/views/admin/category-add.jsp";
+        public static final String CATEGORY_EDIT = "/views/admin/category-edit.jsp";
     }
 }
