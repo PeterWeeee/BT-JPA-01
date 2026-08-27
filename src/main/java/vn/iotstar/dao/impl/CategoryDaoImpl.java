@@ -31,13 +31,30 @@ public class CategoryDaoImpl implements ICategoryDao {
         }
     }
 
+    /**
+     * [LỖI 3+4 đã sửa] Không dùng enma.merge(category) trực tiếp trên detached entity.
+     *
+     * Vấn đề cũ: Category được load bởi EM #1 (đã đóng), sau đó truyền vào đây.
+     * Khi merge() detached entity có @OneToMany(cascade=ALL, orphanRemoval=true),
+     * danh sách videos sẽ là empty → JPA XÓA TOÀN BỘ Video của category đó.
+     *
+     * Giải pháp: load managed entity trong cùng EM này, chỉ set các field cần update,
+     * không động đến collection videos → an toàn.
+     */
     @Override
     public void update(Category category) {
         EntityManager enma = JpaConfig.getEntityManager();
         EntityTransaction trans = enma.getTransaction();
         try {
             trans.begin();
-            enma.merge(category);
+            // Load managed entity trong cùng EM này
+            Category managed = enma.find(Category.class, category.getCategoryId());
+            if (managed != null) {
+                managed.setCategoryname(category.getCategoryname());
+                managed.setImages(category.getImages());
+                managed.setStatus(category.getStatus());
+                // Không set videos → tránh cascade orphanRemoval xóa nhầm dữ liệu
+            }
             trans.commit();
         } catch (Exception e) {
             e.printStackTrace();
@@ -125,12 +142,19 @@ public class CategoryDaoImpl implements ICategoryDao {
         }
     }
 
+    /**
+     * [LỖI 5 đã sửa] Phân trang dùng chỉ số 0-based (trang đầu = page 0).
+     * Công thức: setFirstResult(page * pagesize)
+     *   - page=0 → bỏ qua 0 bản ghi (trang đầu tiên) ✓
+     *   - page=1 → bỏ qua pagesize bản ghi (trang thứ hai) ✓
+     * KHÔNG truyền page=1 để lấy trang đầu, sẽ mất pagesize bản ghi đầu tiên.
+     */
     @Override
     public List<Category> findAll(int page, int pagesize) {
         EntityManager enma = JpaConfig.getEntityManager();
         try {
             TypedQuery<Category> query = enma.createNamedQuery("Category.findAll", Category.class);
-            query.setFirstResult(page * pagesize);
+            query.setFirstResult(page * pagesize); // page là 0-based
             query.setMaxResults(pagesize);
             return query.getResultList();
         } finally {

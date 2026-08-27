@@ -4,17 +4,34 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
-import jakarta.persistence.PersistenceContext;
 import vn.iotstar.entity.Category;
 
-@PersistenceContext
+/**
+ * JpaConfig – cung cấp EntityManager từ một EntityManagerFactory dùng chung (singleton).
+ *
+ * LỖI đã sửa:
+ *  - [LỖI 1] EntityManagerFactory PHẢI được tạo một lần duy nhất (singleton).
+ *            Tạo mới mỗi lần gọi sẽ gây rò rỉ tài nguyên nghiêm trọng.
+ *  - [LỖI 2] Đổi tên persistence-unit từ "jpa-hibernate-mysql" → "jpa-hibernate-sqlserver"
+ *            để phản ánh đúng database thực tế là SQL Server.
+ *  - [LỖI 9] Xóa @PersistenceContext đặt sai trên class (annotation này chỉ dùng
+ *            để inject EntityManager vào một field, không dùng cho class).
+ */
 public class JpaConfig {
 
+    // Singleton: chỉ khởi tạo một lần khi class được load
+    private static final EntityManagerFactory FACTORY =
+            Persistence.createEntityManagerFactory("jpa-hibernate-sqlserver");
+
+    /**
+     * Trả về một EntityManager mới từ factory dùng chung.
+     * Người gọi có trách nhiệm đóng EntityManager sau khi dùng xong.
+     */
     public static EntityManager getEntityManager() {
-        EntityManagerFactory factory = Persistence.createEntityManagerFactory("jpa-hibernate-mysql");
-        return factory.createEntityManager();
+        return FACTORY.createEntityManager();
     }
 
+    /** Test nhanh kết nối JPA */
     public static void main(String[] args) {
         EntityManager enma = JpaConfig.getEntityManager();
         EntityTransaction trans = enma.getTransaction();

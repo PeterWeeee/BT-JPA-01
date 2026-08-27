@@ -3,6 +3,20 @@ package vn.iotstar.connection;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+/**
+ * DBConnection – kết nối JDBC thuần dùng cho phần User (không dùng JPA).
+ *
+ * [LỖI 8 – Lưu ý kiến trúc]
+ * Project này đang dùng HAI cơ chế truy cập DB song song:
+ *   - JPA/Hibernate  → Category & Video  → DB: webst4  (port 1434, persistence.xml)
+ *   - JDBC thuần     → User              → DB: LTWeb   (port 1433, class này)
+ *
+ * Điều này gây ra sự không đồng nhất. Nếu muốn thống nhất, hãy chọn một trong hai:
+ *   1. Dùng JPA cho tất cả: tạo entity User, thêm vào persistence.xml
+ *   2. Dùng JDBC cho tất cả: thay CategoryDaoImpl bằng JDBC
+ *
+ * Hiện tại đảm bảo cả hai DB đều đang chạy trước khi khởi động ứng dụng.
+ */
 public class DBConnection {
 
     private final String serverName = "localhost";

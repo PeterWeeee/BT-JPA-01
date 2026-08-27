@@ -42,13 +42,14 @@ public class CategoryServiceImpl implements ICategoryService {
         }
     }
 
+    /**
+     * [LỖI 7 đã sửa] Không nuốt exception.
+     * Khi xóa thất bại (ví dụ: constraint FK còn Video liên quan), exception được
+     * ném lên controller để hiển thị thông báo lỗi cho người dùng.
+     */
     @Override
-    public void delete(int id) {
-        try {
-            cateDao.delete(id);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void delete(int id) throws Exception {
+        cateDao.delete(id);
     }
 
     @Override
