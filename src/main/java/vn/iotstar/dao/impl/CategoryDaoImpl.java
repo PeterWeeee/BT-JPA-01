@@ -6,15 +6,15 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
+import vn.iotstar.config.JPAConfig;
 import vn.iotstar.dao.ICategoryDao;
 import vn.iotstar.entity.Category;
-import vn.iotstar.repository.JpaConfig;
 
 public class CategoryDaoImpl implements ICategoryDao {
 
     @Override
     public void insert(Category category) {
-        EntityManager enma = JpaConfig.getEntityManager();
+        EntityManager enma = JPAConfig.getEntityManager();
         EntityTransaction trans = enma.getTransaction();
         try {
             trans.begin();
@@ -43,7 +43,7 @@ public class CategoryDaoImpl implements ICategoryDao {
      */
     @Override
     public void update(Category category) {
-        EntityManager enma = JpaConfig.getEntityManager();
+        EntityManager enma = JPAConfig.getEntityManager();
         EntityTransaction trans = enma.getTransaction();
         try {
             trans.begin();
@@ -69,7 +69,7 @@ public class CategoryDaoImpl implements ICategoryDao {
 
     @Override
     public void delete(int cateid) throws Exception {
-        EntityManager enma = JpaConfig.getEntityManager();
+        EntityManager enma = JPAConfig.getEntityManager();
         EntityTransaction trans = enma.getTransaction();
         try {
             trans.begin();
@@ -93,7 +93,7 @@ public class CategoryDaoImpl implements ICategoryDao {
 
     @Override
     public Category findById(int cateid) {
-        EntityManager enma = JpaConfig.getEntityManager();
+        EntityManager enma = JPAConfig.getEntityManager();
         try {
             return enma.find(Category.class, cateid);
         } finally {
@@ -103,7 +103,7 @@ public class CategoryDaoImpl implements ICategoryDao {
 
     @Override
     public Category findByCategoryname(String name) throws Exception {
-        EntityManager enma = JpaConfig.getEntityManager();
+        EntityManager enma = JPAConfig.getEntityManager();
         String jpql = "SELECT c FROM Category c WHERE c.categoryname = :catename";
         try {
             TypedQuery<Category> query = enma.createQuery(jpql, Category.class);
@@ -120,7 +120,7 @@ public class CategoryDaoImpl implements ICategoryDao {
 
     @Override
     public List<Category> findAll() {
-        EntityManager enma = JpaConfig.getEntityManager();
+        EntityManager enma = JPAConfig.getEntityManager();
         try {
             TypedQuery<Category> query = enma.createNamedQuery("Category.findAll", Category.class);
             return query.getResultList();
@@ -131,7 +131,7 @@ public class CategoryDaoImpl implements ICategoryDao {
 
     @Override
     public List<Category> searchByName(String catname) {
-        EntityManager enma = JpaConfig.getEntityManager();
+        EntityManager enma = JPAConfig.getEntityManager();
         String jpql = "SELECT c FROM Category c WHERE c.categoryname LIKE :catname";
         try {
             TypedQuery<Category> query = enma.createQuery(jpql, Category.class);
@@ -151,7 +151,7 @@ public class CategoryDaoImpl implements ICategoryDao {
      */
     @Override
     public List<Category> findAll(int page, int pagesize) {
-        EntityManager enma = JpaConfig.getEntityManager();
+        EntityManager enma = JPAConfig.getEntityManager();
         try {
             TypedQuery<Category> query = enma.createNamedQuery("Category.findAll", Category.class);
             query.setFirstResult(page * pagesize); // page là 0-based
@@ -164,7 +164,7 @@ public class CategoryDaoImpl implements ICategoryDao {
 
     @Override
     public int count() {
-        EntityManager enma = JpaConfig.getEntityManager();
+        EntityManager enma = JPAConfig.getEntityManager();
         String jpql = "SELECT count(c) FROM Category c";
         try {
             Query query = enma.createQuery(jpql);

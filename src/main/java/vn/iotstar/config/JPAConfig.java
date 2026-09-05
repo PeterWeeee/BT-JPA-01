@@ -1,4 +1,4 @@
-package vn.iotstar.repository;
+package vn.iotstar.config;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -17,7 +17,7 @@ import vn.iotstar.entity.Category;
  *  - [LỖI 9] Xóa @PersistenceContext đặt sai trên class (annotation này chỉ dùng
  *            để inject EntityManager vào một field, không dùng cho class).
  */
-public class JpaConfig {
+public class JPAConfig {
 
     // Singleton: chỉ khởi tạo một lần khi class được load
     private static final EntityManagerFactory FACTORY =
@@ -33,7 +33,7 @@ public class JpaConfig {
 
     /** Test nhanh kết nối JPA */
     public static void main(String[] args) {
-        EntityManager enma = JpaConfig.getEntityManager();
+        EntityManager enma = JPAConfig.getEntityManager();
         EntityTransaction trans = enma.getTransaction();
 
         Category cate = new Category();

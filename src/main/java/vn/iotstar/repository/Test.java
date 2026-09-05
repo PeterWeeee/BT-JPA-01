@@ -2,13 +2,14 @@ package vn.iotstar.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import vn.iotstar.config.JPAConfig;
 import vn.iotstar.entity.Category;
 import vn.iotstar.entity.Video;
 
 public class Test {
 
     public static void main(String[] args) {
-        EntityManager enma = JpaConfig.getEntityManager();
+        EntityManager enma = JPAConfig.getEntityManager();
         EntityTransaction trans = enma.getTransaction();
 
         Category cate = new Category();
