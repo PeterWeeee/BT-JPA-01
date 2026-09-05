@@ -50,6 +50,23 @@ public class User implements Serializable {
     @Column(name = "createddate")
     private Date createdDate;
 
+    /**
+     * Trạng thái tài khoản:
+     *  0 = Chưa kích hoạt (mới đăng ký, chờ OTP)
+     *  1 = Đã kích hoạt, đăng nhập được
+     */
+    @Column(name = "status", columnDefinition = "int default 0")
+    private int status;
+
+    /** Mã OTP hiện tại (6 chữ số) */
+    @Column(name = "otp_code", columnDefinition = "nvarchar(10) null")
+    private String otpCode;
+
+    /** Thời hạn hết hạn OTP */
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "otp_expiry")
+    private Date otpExpiry;
+
     public User() {
         super();
     }
@@ -66,6 +83,7 @@ public class User implements Serializable {
         this.roleid = roleid;
         this.phone = phone;
         this.createdDate = createdDate;
+        this.status = 1; // tài khoản mẫu mặc định đã kích hoạt
     }
 
     public User(String email, String userName, String fullName, String passWord, String avatar, int roleid,
@@ -180,9 +198,33 @@ public class User implements Serializable {
         this.createdDate = createdDate;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getOtpCode() {
+        return otpCode;
+    }
+
+    public void setOtpCode(String otpCode) {
+        this.otpCode = otpCode;
+    }
+
+    public Date getOtpExpiry() {
+        return otpExpiry;
+    }
+
+    public void setOtpExpiry(Date otpExpiry) {
+        this.otpExpiry = otpExpiry;
+    }
+
     @Override
     public String toString() {
         return "User [id=" + id + ", email=" + email + ", userName=" + userName + ", fullName=" + fullName
-                + ", roleid=" + roleid + ", phone=" + phone + ", createdDate=" + createdDate + "]";
+                + ", roleid=" + roleid + ", phone=" + phone + ", createdDate=" + createdDate + ", status=" + status + "]";
     }
 }

@@ -16,11 +16,19 @@
                     <a class="nav-link" href="${pageContext.request.contextPath}/home">Trang chủ</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/product">Sản phẩm</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="${pageContext.request.contextPath}/admin/categories">Danh mục</a>
                 </li>
+                <c:if test="${sessionScope.account != null and (sessionScope.account.roleid == 1 or sessionScope.account.roleid == 2)}">
+                    <li class="nav-item">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/admin/products">Quan ly SP</a>
+                    </li>
+                </c:if>
                 <c:if test="${sessionScope.account != null and sessionScope.account.roleid == 1}">
                     <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/admin/home">Người dùng</a>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/admin/home">Nguoi dung</a>
                     </li>
                 </c:if>
             </ul>

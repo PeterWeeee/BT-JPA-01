@@ -75,6 +75,34 @@ public class UserDaoImpl implements IUserDao {
     }
 
     @Override
+    public User findByEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return null;
+        }
+        EntityManager enma = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT u FROM User u WHERE u.email = :email";
+            TypedQuery<User> query = enma.createQuery(jpql, User.class);
+            query.setParameter("email", email.trim());
+            List<User> list = query.getResultList();
+            if (list != null && !list.isEmpty()) {
+                return list.get(0);
+            }
+        } catch (Exception e) {
+            System.err.println("[UserDaoImpl] Loi findByEmail qua JPA: " + e.getMessage());
+        } finally {
+            enma.close();
+        }
+        // Fallback in-memory: chay ca khi JPA tra ve ket qua rong va khi co exception
+        for (User u : fallbackUsers) {
+            if (email.trim().equalsIgnoreCase(u.getEmail())) {
+                return u;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public void insert(User user) {
         EntityManager enma = JPAConfig.getEntityManager();
         EntityTransaction trans = enma.getTransaction();

@@ -9,6 +9,7 @@
 		<class>vn.iotstar.entity.Category</class>
 		<class>vn.iotstar.entity.Video</class>
 		<class>vn.iotstar.entity.User</class>
+		<class>vn.iotstar.entity.Product</class>
 		<properties>
 			<property name="jakarta.persistence.jdbc.url"
 				value="jdbc:sqlserver://localhost:1434;encrypt=true;trustServerCertificate=true;databaseName=webst4" />

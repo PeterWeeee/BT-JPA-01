@@ -57,11 +57,13 @@ public class RegisterController extends HttpServlet {
             return;
         }
 
-        // Thực hiện đăng ký
+        // Thực hiện đăng ký (sẽ tạo OTP và gửi email)
         boolean isSuccess = userService.register(username.trim(), password, email.trim(), fullname, phone);
 
         if (isSuccess) {
-            resp.sendRedirect(req.getContextPath() + "/login?registered=success");
+            // Chuyển sang trang nhập OTP kích hoạt
+            resp.sendRedirect(req.getContextPath() + "/verify-otp?email=" + 
+                java.net.URLEncoder.encode(email.trim(), "UTF-8") + "&type=activate");
         } else {
             req.setAttribute("alert", "Lỗi hệ thống trong quá trình đăng ký!");
             req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);

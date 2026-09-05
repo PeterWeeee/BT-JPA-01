@@ -22,5 +22,19 @@ public class Constant {
         public static final String CATEGORY_LIST = "/views/admin/category-list.jsp";
         public static final String CATEGORY_ADD = "/views/admin/category-add.jsp";
         public static final String CATEGORY_EDIT = "/views/admin/category-edit.jsp";
+        
+        // OTP / Auth views
+        public static final String VERIFY_OTP = "/views/verify-otp.jsp";
+        public static final String FORGOT_PASSWORD = "/views/forgot-password.jsp";
+        public static final String RESET_PASSWORD = "/views/reset-password.jsp";
+        
+        // Product views (public)
+        public static final String PRODUCT_LIST = "/views/product.jsp";
+        public static final String PRODUCT_DETAIL = "/views/product-detail.jsp";
+        
+        // Product views (admin)
+        public static final String ADMIN_PRODUCT_LIST = "/views/admin/product-list.jsp";
+        public static final String ADMIN_PRODUCT_ADD = "/views/admin/product-add.jsp";
+        public static final String ADMIN_PRODUCT_EDIT = "/views/admin/product-edit.jsp";
     }
 }

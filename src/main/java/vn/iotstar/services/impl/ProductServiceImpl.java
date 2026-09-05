@@ -1,0 +1,65 @@
+package vn.iotstar.services.impl;
+
+import java.util.List;
+
+import vn.iotstar.dao.IProductDao;
+import vn.iotstar.dao.impl.ProductDaoImpl;
+import vn.iotstar.entity.Product;
+import vn.iotstar.services.IProductService;
+
+public class ProductServiceImpl implements IProductService {
+
+    private final IProductDao productDao = new ProductDaoImpl();
+
+    @Override
+    public void insert(Product product) {
+        productDao.insert(product);
+    }
+
+    @Override
+    public void update(Product product) {
+        productDao.update(product);
+    }
+
+    @Override
+    public void delete(int id) throws Exception {
+        productDao.delete(id);
+    }
+
+    @Override
+    public Product findById(int id) {
+        return productDao.findById(id);
+    }
+
+    @Override
+    public List<Product> findAll() {
+        return productDao.findAll();
+    }
+
+    @Override
+    public List<Product> findTop10Latest() {
+        return productDao.findTop10Latest();
+    }
+
+    @Override
+    public List<Product> findAllPaged(int page, int pageSize) {
+        if (page < 1) page = 1;
+        return productDao.findAllPaged(page, pageSize);
+    }
+
+    @Override
+    public long countAll() {
+        return productDao.countAll();
+    }
+
+    @Override
+    public int getTotalPages(int pageSize) {
+        long total = countAll();
+        return (int) Math.ceil((double) total / pageSize);
+    }
+
+    @Override
+    public List<Product> searchByName(String keyword) {
+        return productDao.searchByName(keyword);
+    }
+}

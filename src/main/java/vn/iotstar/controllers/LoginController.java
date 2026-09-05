@@ -69,6 +69,16 @@ public class LoginController extends HttpServlet {
         User user = userService.login(username.trim(), password);
 
         if (user != null) {
+            // Kiểm tra tài khoản đã kích hoạt chưa
+            if (user.getStatus() == 0) {
+                req.setAttribute("alert", "Tài khoản chưa được kích hoạt! Vui lòng kiểm tra email và nhập mã OTP.");
+                req.setAttribute("showActivateLink", true);
+                req.setAttribute("pendingEmail", user.getEmail());
+                req.setAttribute("rememberedUser", username);
+                req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+                return;
+            }
+
             // A. ĐĂNG NHẬP VỚI SESSION: Lưu thông tin tài khoản vào Session
             HttpSession session = req.getSession(true);
             session.setAttribute(Constant.SESSION_ACCOUNT, user);

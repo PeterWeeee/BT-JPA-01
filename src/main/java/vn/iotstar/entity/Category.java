@@ -7,6 +7,7 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -39,6 +40,10 @@ public class Category implements Serializable {
 	// bi-directional many-to-one association to Video
 	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Video> videos = new ArrayList<>();
+
+	// 1-N: một danh mục có nhiều sản phẩm
+	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Product> products = new ArrayList<>();
 
 	public Category() {
 		super();
@@ -99,6 +104,14 @@ public class Category implements Serializable {
 
 	public void setVideos(List<Video> videos) {
 		this.videos = videos;
+	}
+
+	public List<Product> getProducts() {
+		return products;
+	}
+
+	public void setProducts(List<Product> products) {
+		this.products = products;
 	}
 
 	public Video addVideo(Video video) {
