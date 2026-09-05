@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import vn.iotstar.constant.Constant;
-import vn.iotstar.models.UserModel;
+import vn.iotstar.entity.User;
 
 /**
  * AuthFilter - Bo loc phan quyen tap trung cho toan bo khu vuc Admin.
@@ -42,7 +42,7 @@ public class AuthFilter implements Filter {
 
         // 2. Kiem tra quyen: Admin (role=1) va Manager (role=2) duoc phep vao /admin/*
         //    User thuong (role=3) bi tu choi.
-        UserModel currentUser = (UserModel) session.getAttribute(Constant.SESSION_ACCOUNT);
+        User currentUser = (User) session.getAttribute(Constant.SESSION_ACCOUNT);
         int role = currentUser.getRoleid();
         if (role != 1 && role != 2) {
             httpResp.sendRedirect(httpReq.getContextPath() + "/home");

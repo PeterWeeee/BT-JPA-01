@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import vn.iotstar.constant.Constant;
-import vn.iotstar.models.UserModel;
+import vn.iotstar.entity.User;
 
 @WebServlet(urlPatterns = { "/waiting" })
 public class WaitingController extends HttpServlet {
@@ -21,7 +21,7 @@ public class WaitingController extends HttpServlet {
         HttpSession session = req.getSession(false);
 
         if (session != null && session.getAttribute(Constant.SESSION_ACCOUNT) != null) {
-            UserModel user = (UserModel) session.getAttribute(Constant.SESSION_ACCOUNT);
+            User user = (User) session.getAttribute(Constant.SESSION_ACCOUNT);
             
             // Phân quyền theo RoleID 
             if (user.getRoleid() == 1) {

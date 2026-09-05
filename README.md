@@ -60,8 +60,8 @@ BT-JPA-01/
 └── src/
     └── main/
         ├── java/vn/iotstar/
-        │   ├── connection/
-        │   │   └── DBConnection.java           (Ket noi JDBC - dung cho User)
+        │   ├── config/
+        │   │   └── JPAConfig.java              (Singleton EntityManagerFactory)
         │   ├── constant/
         │   │   └── Constant.java               (Hang so he thong, duong dan C:\upload)
         │   ├── controllers/
@@ -79,18 +79,18 @@ BT-JPA-01/
         │   │   ├── IUserDao.java
         │   │   └── impl/
         │   │       ├── CategoryDaoImpl.java     (DAO JPA - Category)
-        │   │       └── UserDaoImpl.java         (DAO JDBC - User)
+        │   │       └── UserDaoImpl.java         (DAO JPA - User)
         │   ├── entity/
         │   │   ├── Category.java               (JPA Entity, @OneToMany Video)
-        │   │   └── Video.java                  (JPA Entity, @ManyToOne Category)
+        │   │   ├── Video.java                  (JPA Entity, @ManyToOne Category)
+        │   │   └── User.java                   (JPA Entity, bang users)
         │   ├── filters/
         │   │   └── AuthFilter.java             (Phan quyen tap trung cho /admin/*)
         │   ├── models/
         │   │   ├── CategoryModel.java
-        │   │   └── UserModel.java
+        │   │   └── UserModel.java              (Ke thua User de tuong thich nguoc)
         │   ├── repository/
-        │   │   ├── JpaConfig.java              (Singleton EntityManagerFactory)
-        │   │   └── Test.java                   (Test runner JPA doc lap)
+        │   │   └── Test.java                   (Test runner JPA doc lap ca 3 entity)
         │   └── services/
         │       ├── ICategoryService.java
         │       ├── IUserService.java
@@ -121,21 +121,21 @@ BT-JPA-01/
 
 ---
 
-## 4. Cau Hinh Co So Du Lieu
+## 4. Cau Hinh Co So Du Lieu (Thuan JPA)
 
-Project dung hai nguon du lieu song song:
+Toan bo project da duoc hop nhat 100% sang **JPA / Hibernate ORM**, xoa bo hoan toan JDBC thuan va CSDL phu de tranh xung dot:
 
 | Phan | Co che | Database | Port |
 | :--- | :--- | :---: | :---: |
-| Category & Video | JPA / Hibernate (persistence.xml) | webst4 | 1434 |
-| User | JDBC thuan (DBConnection.java) | LTWeb | 1433 |
+| Toan bo (Category, Video, User) | JPA / Hibernate (persistence.xml) | webst4 | 1434 |
 
-### 4.1 JPA - persistence.xml
+### Cau hinh persistence.xml
 
 ```xml
 <persistence-unit name="jpa-hibernate-sqlserver">
     <class>vn.iotstar.entity.Category</class>
     <class>vn.iotstar.entity.Video</class>
+    <class>vn.iotstar.entity.User</class>
     <properties>
         <property name="jakarta.persistence.jdbc.url"
                   value="jdbc:sqlserver://localhost:1434;encrypt=true;
@@ -151,17 +151,6 @@ Project dung hai nguon du lieu song song:
                   value="org.hibernate.dialect.SQLServerDialect" />
     </properties>
 </persistence-unit>
-```
-
-### 4.2 JDBC - DBConnection.java
-
-Chinh sua truc tiep cac field trong class:
-
-```java
-private final String dbName     = "LTWeb";
-private final String portNumber = "1433";
-private final String userID     = "sa";
-private final String password   = "123456";
 ```
 
 > Thu muc luu anh upload: `C:\upload\category` (tu dong tao neu chua co).

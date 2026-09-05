@@ -1,198 +1,237 @@
 package vn.iotstar.dao.impl;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import vn.iotstar.connection.DBConnection;
-import vn.iotstar.dao.IUserDao;
-import vn.iotstar.models.UserModel;
 
-public class UserDaoImpl extends DBConnection implements IUserDao {
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.TypedQuery;
+import vn.iotstar.config.JPAConfig;
+import vn.iotstar.dao.IUserDao;
+import vn.iotstar.entity.User;
+
+public class UserDaoImpl implements IUserDao {
 
     // Danh sách dự phòng (In-Memory Fallback) khi chưa khởi động SQL Server
-    private static final List<UserModel> fallbackUsers = new ArrayList<>();
+    private static final List<User> fallbackUsers = new ArrayList<>();
     static {
-        long now = System.currentTimeMillis();
-        fallbackUsers.add(new UserModel(1, "admin@iotstar.vn", "admin", "Quản Trị Viên", "123", "admin.png", 1, "0901234567", new Date(now)));
-        fallbackUsers.add(new UserModel(2, "manager@iotstar.vn", "manager", "Quản Lý Cửa Hàng", "123", "manager.png", 2, "0902345678", new Date(now)));
-        fallbackUsers.add(new UserModel(3, "user@iotstar.vn", "user", "Nguyễn Văn A", "123", "user.png", 3, "0903456789", new Date(now)));
-        fallbackUsers.add(new UserModel(4, "trungnh@hcmute.edu.vn", "trungnh", "ThS. Nguyễn Hữu Trung", "123", "trungnh.png", 1, "0908617108", new Date(now)));
+        Date now = new Date();
+        fallbackUsers.add(new User(1, "admin@iotstar.vn", "admin", "Quản Trị Viên", "123", "admin.png", 1, "0901234567", now));
+        fallbackUsers.add(new User(2, "manager@iotstar.vn", "manager", "Quản Lý Cửa Hàng", "123", "manager.png", 2, "0902345678", now));
+        fallbackUsers.add(new User(3, "user@iotstar.vn", "user", "Nguyễn Văn A", "123", "user.png", 3, "0903456789", now));
+        fallbackUsers.add(new User(4, "trungnh@hcmute.edu.vn", "trungnh", "ThS. Nguyễn Hữu Trung", "123", "trungnh.png", 1, "0908617108", now));
     }
 
     @Override
-    public UserModel get(String username) {
-        String sql = "SELECT * FROM [User] WHERE username = ?";
-        try (Connection conn = super.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, username);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    UserModel user = new UserModel();
-                    user.setId(rs.getInt("id"));
-                    user.setEmail(rs.getString("email"));
-                    user.setUserName(rs.getString("username"));
-                    user.setFullName(rs.getString("fullname"));
-                    user.setPassWord(rs.getString("password"));
-                    user.setAvatar(rs.getString("avatar"));
-                    user.setRoleid(rs.getInt("roleid"));
-                    user.setPhone(rs.getString("phone"));
-                    user.setCreatedDate(rs.getDate("createddate"));
-                    return user;
-                }
+    public User get(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            return null;
+        }
+        EntityManager enma = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT u FROM User u WHERE u.userName = :username";
+            TypedQuery<User> query = enma.createQuery(jpql, User.class);
+            query.setParameter("username", username.trim());
+            List<User> list = query.getResultList();
+            if (list != null && !list.isEmpty()) {
+                return list.get(0);
             }
         } catch (Exception e) {
-            System.err.println("[UserDaoImpl] Lỗi truy vấn Database (sử dụng dữ liệu mẫu dự phòng): " + e.getMessage());
-            for (UserModel u : fallbackUsers) {
-                if (u.getUserName().equalsIgnoreCase(username)) {
-                    return u;
-                }
+            System.err.println("[UserDaoImpl] Không thể truy vấn JPA (sử dụng tài khoản mẫu dự phòng): " + e.getMessage());
+        } finally {
+            enma.close();
+        }
+
+        // Fallback in-memory khi CSDL trống hoặc chưa kết nối
+        for (User u : fallbackUsers) {
+            if (u.getUserName().equalsIgnoreCase(username.trim())) {
+                return u;
             }
         }
         return null;
     }
 
     @Override
-    public UserModel get(int id) {
-        String sql = "SELECT * FROM [User] WHERE id = ?";
-        try (Connection conn = super.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    UserModel user = new UserModel();
-                    user.setId(rs.getInt("id"));
-                    user.setEmail(rs.getString("email"));
-                    user.setUserName(rs.getString("username"));
-                    user.setFullName(rs.getString("fullname"));
-                    user.setPassWord(rs.getString("password"));
-                    user.setAvatar(rs.getString("avatar"));
-                    user.setRoleid(rs.getInt("roleid"));
-                    user.setPhone(rs.getString("phone"));
-                    user.setCreatedDate(rs.getDate("createddate"));
-                    return user;
-                }
+    public User get(int id) {
+        EntityManager enma = JPAConfig.getEntityManager();
+        try {
+            User user = enma.find(User.class, id);
+            if (user != null) {
+                return user;
             }
         } catch (Exception e) {
-            System.err.println("[UserDaoImpl] Lỗi get(id): " + e.getMessage());
-            for (UserModel u : fallbackUsers) {
-                if (u.getId() == id) {
-                    return u;
-                }
+            System.err.println("[UserDaoImpl] Lỗi get(id) qua JPA: " + e.getMessage());
+        } finally {
+            enma.close();
+        }
+
+        for (User u : fallbackUsers) {
+            if (u.getId() == id) {
+                return u;
             }
         }
         return null;
     }
 
     @Override
-    public void insert(UserModel user) {
-        String sql = "INSERT INTO [User](email, username, fullname, password, avatar, roleid, phone, createddate) VALUES (?,?,?,?,?,?,?,?)";
-        try (Connection conn = super.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, user.getEmail());
-            ps.setString(2, user.getUserName());
-            ps.setString(3, user.getFullName());
-            ps.setString(4, user.getPassWord());
-            ps.setString(5, user.getAvatar());
-            ps.setInt(6, user.getRoleid());
-            ps.setString(7, user.getPhone());
-            ps.setDate(8, user.getCreatedDate() != null ? user.getCreatedDate() : new Date(System.currentTimeMillis()));
-            ps.executeUpdate();
+    public void insert(User user) {
+        EntityManager enma = JPAConfig.getEntityManager();
+        EntityTransaction trans = enma.getTransaction();
+        try {
+            trans.begin();
+            if (user.getCreatedDate() == null) {
+                user.setCreatedDate(new Date());
+            }
+            enma.persist(user);
+            trans.commit();
         } catch (Exception e) {
-            System.err.println("[UserDaoImpl] Lỗi insert vào Database: " + e.getMessage());
+            System.err.println("[UserDaoImpl] Lỗi insert qua JPA (lưu vào bộ nhớ dự phòng): " + e.getMessage());
+            if (trans.isActive()) {
+                trans.rollback();
+            }
             user.setId(fallbackUsers.size() + 1);
             fallbackUsers.add(user);
+        } finally {
+            enma.close();
+        }
+    }
+
+    @Override
+    public void update(User user) {
+        EntityManager enma = JPAConfig.getEntityManager();
+        EntityTransaction trans = enma.getTransaction();
+        try {
+            trans.begin();
+            enma.merge(user);
+            trans.commit();
+        } catch (Exception e) {
+            System.err.println("[UserDaoImpl] Lỗi update qua JPA: " + e.getMessage());
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            throw e;
+        } finally {
+            enma.close();
+        }
+    }
+
+    @Override
+    public void delete(int id) throws Exception {
+        EntityManager enma = JPAConfig.getEntityManager();
+        EntityTransaction trans = enma.getTransaction();
+        try {
+            trans.begin();
+            User user = enma.find(User.class, id);
+            if (user != null) {
+                enma.remove(user);
+            } else {
+                throw new Exception("Không tìm thấy người dùng có id = " + id);
+            }
+            trans.commit();
+        } catch (Exception e) {
+            System.err.println("[UserDaoImpl] Lỗi delete qua JPA: " + e.getMessage());
+            if (trans.isActive()) {
+                trans.rollback();
+            }
+            throw e;
+        } finally {
+            enma.close();
         }
     }
 
     @Override
     public boolean checkExistEmail(String email) {
-        String sql = "SELECT 1 FROM [User] WHERE email = ?";
-        try (Connection conn = super.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, email);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return true;
-                }
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
+        EntityManager enma = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(u) FROM User u WHERE u.email = :email";
+            TypedQuery<Long> query = enma.createQuery(jpql, Long.class);
+            query.setParameter("email", email.trim());
+            Long count = query.getSingleResult();
+            if (count != null && count > 0) {
+                return true;
             }
         } catch (Exception e) {
-            for (UserModel u : fallbackUsers) {
-                if (email != null && email.equalsIgnoreCase(u.getEmail())) {
+            for (User u : fallbackUsers) {
+                if (email.trim().equalsIgnoreCase(u.getEmail())) {
                     return true;
                 }
             }
+        } finally {
+            enma.close();
         }
         return false;
     }
 
     @Override
     public boolean checkExistUsername(String username) {
-        String sql = "SELECT 1 FROM [User] WHERE username = ?";
-        try (Connection conn = super.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, username);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return true;
-                }
+        if (username == null || username.trim().isEmpty()) {
+            return false;
+        }
+        EntityManager enma = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(u) FROM User u WHERE u.userName = :username";
+            TypedQuery<Long> query = enma.createQuery(jpql, Long.class);
+            query.setParameter("username", username.trim());
+            Long count = query.getSingleResult();
+            if (count != null && count > 0) {
+                return true;
             }
         } catch (Exception e) {
-            for (UserModel u : fallbackUsers) {
-                if (username != null && username.equalsIgnoreCase(u.getUserName())) {
+            for (User u : fallbackUsers) {
+                if (username.trim().equalsIgnoreCase(u.getUserName())) {
                     return true;
                 }
             }
+        } finally {
+            enma.close();
         }
         return false;
     }
 
     @Override
     public boolean checkExistPhone(String phone) {
-        String sql = "SELECT 1 FROM [User] WHERE phone = ?";
-        try (Connection conn = super.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, phone);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return true;
-                }
+        if (phone == null || phone.trim().isEmpty()) {
+            return false;
+        }
+        EntityManager enma = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(u) FROM User u WHERE u.phone = :phone";
+            TypedQuery<Long> query = enma.createQuery(jpql, Long.class);
+            query.setParameter("phone", phone.trim());
+            Long count = query.getSingleResult();
+            if (count != null && count > 0) {
+                return true;
             }
         } catch (Exception e) {
-            for (UserModel u : fallbackUsers) {
-                if (phone != null && phone.equalsIgnoreCase(u.getPhone())) {
+            for (User u : fallbackUsers) {
+                if (phone.trim().equalsIgnoreCase(u.getPhone())) {
                     return true;
                 }
             }
+        } finally {
+            enma.close();
         }
         return false;
     }
 
     @Override
-    public List<UserModel> getAll() {
-        List<UserModel> list = new ArrayList<>();
-        String sql = "SELECT * FROM [User]";
-        try (Connection conn = super.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                UserModel user = new UserModel();
-                user.setId(rs.getInt("id"));
-                user.setEmail(rs.getString("email"));
-                user.setUserName(rs.getString("username"));
-                user.setFullName(rs.getString("fullname"));
-                user.setPassWord(rs.getString("password"));
-                user.setAvatar(rs.getString("avatar"));
-                user.setRoleid(rs.getInt("roleid"));
-                user.setPhone(rs.getString("phone"));
-                user.setCreatedDate(rs.getDate("createddate"));
-                list.add(user);
+    public List<User> getAll() {
+        EntityManager enma = JPAConfig.getEntityManager();
+        try {
+            TypedQuery<User> query = enma.createNamedQuery("User.findAll", User.class);
+            List<User> list = query.getResultList();
+            if (list != null && !list.isEmpty()) {
+                return list;
             }
-            return list;
         } catch (Exception e) {
-            return new ArrayList<>(fallbackUsers);
+            System.err.println("[UserDaoImpl] Lỗi getAll() qua JPA: " + e.getMessage());
+        } finally {
+            enma.close();
         }
+        return new ArrayList<>(fallbackUsers);
     }
 }

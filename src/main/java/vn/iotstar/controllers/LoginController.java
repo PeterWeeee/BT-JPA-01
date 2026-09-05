@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import vn.iotstar.constant.Constant;
-import vn.iotstar.models.UserModel;
+import vn.iotstar.entity.User;
 import vn.iotstar.services.IUserService;
 import vn.iotstar.services.impl.UserServiceImpl;
 
@@ -66,7 +66,7 @@ public class LoginController extends HttpServlet {
         }
 
         // Gọi tầng Service kiểm tra thông tin đăng nhập
-        UserModel user = userService.login(username.trim(), password);
+        User user = userService.login(username.trim(), password);
 
         if (user != null) {
             // A. ĐĂNG NHẬP VỚI SESSION: Lưu thông tin tài khoản vào Session

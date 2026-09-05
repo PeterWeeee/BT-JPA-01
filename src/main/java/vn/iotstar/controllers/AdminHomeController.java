@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import vn.iotstar.constant.Constant;
-import vn.iotstar.models.UserModel;
+import vn.iotstar.entity.User;
 import vn.iotstar.services.IUserService;
 import vn.iotstar.services.impl.UserServiceImpl;
 
@@ -30,14 +30,14 @@ public class AdminHomeController extends HttpServlet {
             return;
         }
 
-        UserModel currentUser = (UserModel) session.getAttribute(Constant.SESSION_ACCOUNT);
+        User currentUser = (User) session.getAttribute(Constant.SESSION_ACCOUNT);
         if (currentUser.getRoleid() != 1) {
             resp.sendRedirect(req.getContextPath() + "/home");
             return;
         }
 
         // Lấy danh sách toàn bộ người dùng để hiển thị trên Dashboard Admin
-        List<UserModel> userList = userService.getAll();
+        List<User> userList = userService.getAll();
         req.setAttribute("userList", userList);
         req.setAttribute("currentUser", currentUser);
 

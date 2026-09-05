@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import vn.iotstar.constant.Constant;
-import vn.iotstar.models.UserModel;
+import vn.iotstar.entity.User;
 
 @WebServlet(urlPatterns = { "/manager/home" })
 public class ManagerHomeController extends HttpServlet {
@@ -26,7 +26,7 @@ public class ManagerHomeController extends HttpServlet {
             return;
         }
 
-        UserModel currentUser = (UserModel) session.getAttribute(Constant.SESSION_ACCOUNT);
+        User currentUser = (User) session.getAttribute(Constant.SESSION_ACCOUNT);
         if (currentUser.getRoleid() != 2 && currentUser.getRoleid() != 1) {
             resp.sendRedirect(req.getContextPath() + "/home");
             return;

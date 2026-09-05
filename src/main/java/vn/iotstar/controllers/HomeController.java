@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import vn.iotstar.constant.Constant;
-import vn.iotstar.models.UserModel;
+import vn.iotstar.entity.User;
 
 @WebServlet(urlPatterns = { "/home", "/user/home" })
 public class HomeController extends HttpServlet {
@@ -19,7 +19,7 @@ public class HomeController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
             throws ServletException, IOException {
         HttpSession session = req.getSession(false);
-        UserModel account = (session != null) ? (UserModel) session.getAttribute(Constant.SESSION_ACCOUNT) : null;
+        User account = (session != null) ? (User) session.getAttribute(Constant.SESSION_ACCOUNT) : null;
         req.setAttribute("account", account);
         req.getRequestDispatcher(Constant.Path.HOME).forward(req, resp);
     }

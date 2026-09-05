@@ -1,10 +1,11 @@
 package vn.iotstar.services.impl;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
+
 import vn.iotstar.dao.IUserDao;
 import vn.iotstar.dao.impl.UserDaoImpl;
-import vn.iotstar.models.UserModel;
+import vn.iotstar.entity.User;
 import vn.iotstar.services.IUserService;
 
 public class UserServiceImpl implements IUserService {
@@ -12,11 +13,11 @@ public class UserServiceImpl implements IUserService {
     private final IUserDao userDao = new UserDaoImpl();
 
     @Override
-    public UserModel login(String username, String password) {
+    public User login(String username, String password) {
         if (username == null || password == null || username.trim().isEmpty() || password.trim().isEmpty()) {
             return null;
         }
-        UserModel user = this.get(username.trim());
+        User user = this.get(username.trim());
         if (user != null && password.equals(user.getPassWord())) {
             return user;
         }
@@ -24,7 +25,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserModel get(String username) {
+    public User get(String username) {
         if (username == null || username.trim().isEmpty()) {
             return null;
         }
@@ -32,13 +33,23 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserModel get(int id) {
+    public User get(int id) {
         return userDao.get(id);
     }
 
     @Override
-    public void insert(UserModel user) {
+    public void insert(User user) {
         userDao.insert(user);
+    }
+
+    @Override
+    public void update(User user) {
+        userDao.update(user);
+    }
+
+    @Override
+    public void delete(int id) throws Exception {
+        userDao.delete(id);
     }
 
     @Override
@@ -46,9 +57,7 @@ public class UserServiceImpl implements IUserService {
         if (checkExistUsername(username)) {
             return false;
         }
-        long millis = System.currentTimeMillis();
-        Date date = new Date(millis);
-        UserModel newUser = new UserModel(email, username, fullname, password, "default-avatar.png", 3, phone, date);
+        User newUser = new User(email, username, fullname, password, "default-avatar.png", 3, phone, new Date());
         userDao.insert(newUser);
         return true;
     }
@@ -69,7 +78,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public List<UserModel> getAll() {
+    public List<User> getAll() {
         return userDao.getAll();
     }
 }

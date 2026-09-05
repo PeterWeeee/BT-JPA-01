@@ -8,6 +8,7 @@
 	<persistence-unit name="jpa-hibernate-sqlserver">
 		<class>vn.iotstar.entity.Category</class>
 		<class>vn.iotstar.entity.Video</class>
+		<class>vn.iotstar.entity.User</class>
 		<properties>
 			<property name="jakarta.persistence.jdbc.url"
 				value="jdbc:sqlserver://localhost:1434;encrypt=true;trustServerCertificate=true;databaseName=webst4" />
