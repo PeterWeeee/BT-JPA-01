@@ -29,7 +29,7 @@ public class LoginController extends HttpServlet {
             return;
         }
 
-        // 2. Kiểm tra Cookie Remember Me (theo slide 01 & slide 06)
+        // 2. Kiểm tra Cookie Remember Me
         Cookie[] cookies = req.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
