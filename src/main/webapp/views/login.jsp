@@ -1,14 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <title>Đăng Nhập</title>
-    <jsp:include page="/views/common/header.jsp" />
-</head>
-<body>
-    <jsp:include page="/views/common/topbar.jsp" />
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<t:layout title="Đăng Nhập">
     <div class="container py-4">
         <div class="row justify-content-center">
             <div class="col-md-5">
@@ -36,19 +30,19 @@
                         </div>
                     </c:if>
 
-                    <%-- Thông báo lỗi --%>
+                    <%-- Thong bao loi --%>
                     <c:if test="${alert != null}">
                         <div class="alert alert-danger py-2 mb-3" role="alert">
                             ${alert}
                             <c:if test="${showActivateLink}">
                                 <br>
                                 <a href="${pageContext.request.contextPath}/verify-otp?email=${pendingEmail}&type=activate"
-                                   class="alert-link">→ Kích hoạt tài khoản ngay</a>
+                                   class="alert-link">Kích hoạt tài khoản ngay</a>
                             </c:if>
                         </div>
                     </c:if>
 
-                    <form action="${pageContext.request.contextPath}/login" method="post">
+                    <form action="${pageContext.request.contextPath}/login" method="post" class="needs-validation" novalidate>
                         <div class="mb-3">
                             <label class="form-label">Tên đăng nhập:</label>
                             <input type="text" 
@@ -57,6 +51,9 @@
                                    name="username" 
                                    value="${rememberedUser}" 
                                    required autofocus>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập tên đăng nhập.
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -66,6 +63,9 @@
                                    placeholder="Nhập mật khẩu" 
                                    name="password" 
                                    required>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập mật khẩu.
+                            </div>
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -99,7 +99,4 @@
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</t:layout>
