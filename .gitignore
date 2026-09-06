@@ -32,3 +32,7 @@ out/
 Thumbs.db
 desktop.ini
 *.log
+
+# Custom summary files
+chat_context_summary*
+sitemesh_debug_summary*
