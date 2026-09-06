@@ -44,11 +44,34 @@
                         </li>
                     </c:when>
                     <c:otherwise>
-                        <li class="nav-item me-3 text-light">
-                            Xin chào, <strong>${sessionScope.account.fullName}</strong>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-sm btn-danger px-3" href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <!-- User Avatar/Icon -->
+                                <c:choose>
+                                    <c:when test="${not empty sessionScope.account.avatar and sessionScope.account.avatar ne 'default-avatar.png'}">
+                                        <img src="${pageContext.request.contextPath}/download-image?filename=avatar/${sessionScope.account.avatar}" 
+                                             alt="Avatar" 
+                                             style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%; border: 2px solid #fff;">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <i class="bi bi-person-circle fs-5"></i>
+                                    </c:otherwise>
+                                </c:choose>
+                                <strong class="ms-1">${sessionScope.account.fullName}</strong>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="userDropdown">
+                                <li>
+                                    <a class="dropdown-item py-2" href="${pageContext.request.contextPath}/profile">
+                                        <i class="bi bi-person-gear me-2 text-primary"></i>Hồ sơ của tôi
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item py-2 text-danger" href="${pageContext.request.contextPath}/logout">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     </c:otherwise>
                 </c:choose>
@@ -56,4 +79,3 @@
         </div>
     </div>
 </nav>
-

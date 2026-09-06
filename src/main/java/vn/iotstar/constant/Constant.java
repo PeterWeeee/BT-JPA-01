@@ -36,5 +36,7 @@ public class Constant {
         public static final String ADMIN_PRODUCT_LIST = "/views/admin/product-list.jsp";
         public static final String ADMIN_PRODUCT_ADD = "/views/admin/product-add.jsp";
         public static final String ADMIN_PRODUCT_EDIT = "/views/admin/product-edit.jsp";
+        // Profile
+        public static final String PROFILE = "/views/profile.jsp";
     }
 }
