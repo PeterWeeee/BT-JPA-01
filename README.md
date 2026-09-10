@@ -66,6 +66,7 @@ Ung dung Web Java phat trien theo kien truc MVC 3 tang, su dung Jakarta EE 10
 
 ```
 BT-JPA-01/
+├── database.sql                    (Script tao CSDL SQL Server webst4 va du lieu mau)
 ├── pom.xml
 ├── README.md
 └── src/
@@ -201,7 +202,8 @@ mail.from.name=IoTStar Shop
 ---
 
 ## 5. Huong Dan Khoi Chay
-
+ 
+0. **Co so du lieu**: Mo file `database.sql` trong SQL Server Management Studio (SSMS) va thuc thi (Execute) de khoi tao database `webst4` va nap du lieu mau.
 1. **Import**: Eclipse / STS -> File -> Import -> Existing Maven Projects -> chon thu muc `BT-JPA-01`.
 2. **Chay**: Chuot phai du an -> Run As -> Run on Server (Tomcat 10.1 hoac Tomcat 11).
 3. **Truy cap**: `http://localhost:8080/BT-JPA-01/`
